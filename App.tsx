@@ -6,9 +6,6 @@ import {
   Target,
   TrendingUp,
   Award,
-  Calendar,
-  Play,
-  Pause,
   RotateCcw,
   CheckCircle2,
   Download,
@@ -19,17 +16,13 @@ import {
   Plus,
   BarChart3,
   PieChart as PieChartIcon,
-  MessageSquare,
   Send,
   X,
   Code2,
-  Sliders,
-  AlertCircle,
   ChevronRight,
   Brain,
   Layers,
   RefreshCw,
-  FileJson,
   Check
 } from 'lucide-react';
 import {
@@ -42,7 +35,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   Cell,
   PieChart,
   Pie,
@@ -73,7 +65,7 @@ export interface StudySession {
   topic: string;
   date: string; // YYYY-MM-DD
   timestamp: number;
-  source: 'manual' | 'pomodoro';
+  source?: 'manual' | 'pomodoro';
 }
 
 export interface GoalItem {
@@ -224,25 +216,25 @@ const generateSeedSessions = (): StudySession[] => {
     topic: string;
     source: 'manual' | 'pomodoro';
   }> = [
-    { daysAgo: 0, subjectId: 'sat', durationMinutes: 90, comprehension: 4, topic: 'Digital SAT RW Module 2 - Craft & Structure', source: 'pomodoro' },
+    { daysAgo: 0, subjectId: 'sat', durationMinutes: 90, comprehension: 4, topic: 'Digital SAT RW Module 2 - Craft & Structure', source: 'manual' },
     { daysAgo: 0, subjectId: 'math_ap', durationMinutes: 60, comprehension: 5, topic: 'Integration by Parts & Partial Fractions', source: 'manual' },
-    { daysAgo: 1, subjectId: 'ielts', durationMinutes: 75, comprehension: 4, topic: 'Writing Task 2: Opinion Essay + Lexical Resource', source: 'pomodoro' },
+    { daysAgo: 1, subjectId: 'ielts', durationMinutes: 75, comprehension: 4, topic: 'Writing Task 2: Opinion Essay + Lexical Resource', source: 'manual' },
     { daysAgo: 1, subjectId: 'physics', durationMinutes: 45, comprehension: 3, topic: 'Dao động điều hòa & Con lắc lò xo nâng cao', source: 'manual' },
     { daysAgo: 2, subjectId: 'sat', durationMinutes: 110, comprehension: 5, topic: 'Full Math Timed Drill + Desmos Regression Tricks', source: 'manual' },
-    { daysAgo: 2, subjectId: 'english_grammar', durationMinutes: 50, comprehension: 4, topic: 'Inversion, Subjunctive Mood & C2 Collocations', source: 'pomodoro' },
+    { daysAgo: 2, subjectId: 'english_grammar', durationMinutes: 50, comprehension: 4, topic: 'Inversion, Subjunctive Mood & C2 Collocations', source: 'manual' },
     { daysAgo: 3, subjectId: 'math_ap', durationMinutes: 85, comprehension: 4, topic: 'Parametric Equations & Polar Coordinates (BC)', source: 'manual' },
     { daysAgo: 4, subjectId: 'ielts', durationMinutes: 60, comprehension: 4, topic: 'Cambridge 19 Test 3 Listening + Reading Passage 3', source: 'manual' },
     { daysAgo: 5, subjectId: 'physics', durationMinutes: 60, comprehension: 3, topic: 'Điện xoay chiều & Giản đồ Fre-nen', source: 'manual' },
-    { daysAgo: 6, subjectId: 'sat', durationMinutes: 95, comprehension: 4, topic: 'Logical Completion & Command of Evidence (Quantitative)', source: 'pomodoro' },
+    { daysAgo: 6, subjectId: 'sat', durationMinutes: 95, comprehension: 4, topic: 'Logical Completion & Command of Evidence (Quantitative)', source: 'manual' },
     { daysAgo: 7, subjectId: 'english_grammar', durationMinutes: 45, comprehension: 5, topic: 'Academic Phrasal Verbs & Idiomatic Expressions', source: 'manual' },
-    { daysAgo: 8, subjectId: 'math_ap', durationMinutes: 90, comprehension: 5, topic: 'Fundamental Theorem of Calculus & Differential Equations', source: 'pomodoro' },
+    { daysAgo: 8, subjectId: 'math_ap', durationMinutes: 90, comprehension: 5, topic: 'Fundamental Theorem of Calculus & Differential Equations', source: 'manual' },
     { daysAgo: 9, subjectId: 'ielts', durationMinutes: 80, comprehension: 4, topic: 'Speaking Part 2 & 3 Fluency Recording Drill', source: 'manual' },
     { daysAgo: 10, subjectId: 'sat', durationMinutes: 120, comprehension: 4, topic: 'Bluebook Practice Test #5 Review & Error Log', source: 'manual' },
     { daysAgo: 12, subjectId: 'physics', durationMinutes: 55, comprehension: 4, topic: 'Sóng cơ học & Giao thoa sóng hai nguồn kết hợp', source: 'manual' },
-    { daysAgo: 13, subjectId: 'math_ap', durationMinutes: 70, comprehension: 4, topic: 'L’Hôpital’s Rule & Related Rates Optimization', source: 'pomodoro' },
+    { daysAgo: 13, subjectId: 'math_ap', durationMinutes: 70, comprehension: 4, topic: 'L’Hôpital’s Rule & Related Rates Optimization', source: 'manual' },
     { daysAgo: 15, subjectId: 'english_grammar', durationMinutes: 60, comprehension: 4, topic: 'Punctuation Rules for SAT Standard English Conventions', source: 'manual' },
     { daysAgo: 17, subjectId: 'ielts', durationMinutes: 90, comprehension: 4, topic: 'Writing Task 1: Process & Dynamic Charts Comparison', source: 'manual' },
-    { daysAgo: 19, subjectId: 'sat', durationMinutes: 85, comprehension: 5, topic: 'Advanced Geometry, Trigonometry & Circle Theorems', source: 'pomodoro' },
+    { daysAgo: 19, subjectId: 'sat', durationMinutes: 85, comprehension: 5, topic: 'Advanced Geometry, Trigonometry & Circle Theorems', source: 'manual' },
     { daysAgo: 21, subjectId: 'math_ap', durationMinutes: 100, comprehension: 5, topic: 'Implicit Differentiation & Inverse Trig Derivatives', source: 'manual' },
     { daysAgo: 24, subjectId: 'physics', durationMinutes: 50, comprehension: 3, topic: 'Động lực học chất điểm & Định luật bảo toàn', source: 'manual' },
     { daysAgo: 27, subjectId: 'ielts', durationMinutes: 65, comprehension: 4, topic: 'Reading True/False/Not Given Deep Analysis', source: 'manual' }
@@ -305,33 +297,7 @@ const getZeroBlankState = (): ScholarPulseState => ({
 });
 
 // ============================================================================
-// 3. SOUND UTILITY (Web Audio API Chime for Pomodoro)
-// ============================================================================
-
-const playNotificationChime = () => {
-  try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new AudioCtx();
-    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.14);
-      gain.gain.setValueAtTime(0.15, ctx.currentTime + idx * 0.14);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.14 + 0.45);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(ctx.currentTime + idx * 0.14);
-      osc.stop(ctx.currentTime + idx * 0.14 + 0.45);
-    });
-  } catch {
-    // Ignore audio error if blocked by browser autoplay policy
-  }
-};
-
-// ============================================================================
-// 4. MODULAR SUB-COMPONENTS
+// 3. MODULAR SUB-COMPONENTS
 // ============================================================================
 
 interface HeaderProps {
@@ -484,7 +450,7 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 // ============================================================================
-// 5. TOP METRIC CARDS COMPONENT (`MetricCards.tsx`)
+// 4. TOP METRIC CARDS COMPONENT (`MetricCards.tsx`)
 // ============================================================================
 
 interface MetricCardsProps {
@@ -739,7 +705,7 @@ const MetricCards: React.FC<MetricCardsProps> = ({
 };
 
 // ============================================================================
-// 6. GOALS & DEADLINES SECTION (`GoalSection.tsx`)
+// 5. GOALS & DEADLINES SECTION (`GoalSection.tsx`)
 // ============================================================================
 
 interface GoalSectionProps {
@@ -905,7 +871,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ goals, onUpdateGoal }) => {
 };
 
 // ============================================================================
-// 7. TIME DISTRIBUTION TABLE (`TimeDistributionTable.tsx`)
+// 6. TIME DISTRIBUTION TABLE (`TimeDistributionTable.tsx`)
 // ============================================================================
 
 interface TimeDistributionTableProps {
@@ -938,88 +904,90 @@ const TimeDistributionTable: React.FC<TimeDistributionTableProps> = ({ sessions 
   }, [sessions]);
 
   return (
-    <div className="rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
-            <BookOpen className="w-4 h-4" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-white">
-              Phân bổ Thời gian Giữa các Môn học
-            </h2>
-            <p className="text-xs text-slate-400">
-              Tỷ trọng giờ học thực tế &amp; mức độ hiểu bài trung bình từng môn
-            </p>
+    <div className="rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg h-full flex flex-col justify-between">
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+              <BookOpen className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white">
+                Phân bổ Thời gian Giữa các Môn học
+              </h2>
+              <p className="text-xs text-slate-400">
+                Tỷ trọng giờ học thực tế &amp; mức độ hiểu bài trung bình từng môn
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-white/10 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              <th className="py-3 pr-4">Môn học / Chuyên đề</th>
-              <th className="py-3 px-3 text-right">Số phiên</th>
-              <th className="py-3 px-3 text-right">Thời lượng</th>
-              <th className="py-3 px-3 text-right">Độ hiểu TB</th>
-              <th className="py-3 pl-4 w-44 sm:w-56">Tỷ trọng (%)</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5 text-sm">
-            {distribution.map((row) => (
-              <tr key={row.id} className="hover:bg-white/[0.02] transition">
-                <td className="py-3.5 pr-4">
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ backgroundColor: row.color }}
-                    />
-                    <div>
-                      <div className="font-semibold text-slate-100">{row.name}</div>
-                      <span className="text-[11px] text-slate-400">{row.category}</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="py-3.5 px-3 text-right tabular-nums text-slate-300">
-                  {row.sessionCount} phiên
-                </td>
-                <td className="py-3.5 px-3 text-right tabular-nums">
-                  <span className="font-bold text-white">{row.hours}h</span>{' '}
-                  <span className="text-xs text-slate-400">({row.mins}p)</span>
-                </td>
-                <td className="py-3.5 px-3 text-right tabular-nums">
-                  <span className="px-2 py-0.5 rounded-md bg-slate-800 border border-white/10 text-xs font-semibold text-cyan-300">
-                    {row.avgComp} / 5.0
-                  </span>
-                </td>
-                <td className="py-3.5 pl-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${row.share}%`,
-                          backgroundColor: row.color
-                        }}
-                      />
-                    </div>
-                    <span className="w-10 text-right text-xs font-bold tabular-nums text-slate-200">
-                      {row.share}%
-                    </span>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/10 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <th className="py-3 pr-4">Môn học / Chuyên đề</th>
+                <th className="py-3 px-3 text-right">Số phiên</th>
+                <th className="py-3 px-3 text-right">Thời lượng</th>
+                <th className="py-3 px-3 text-right">Độ hiểu TB</th>
+                <th className="py-3 pl-4 w-44 sm:w-56">Tỷ trọng (%)</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-white/5 text-sm">
+              {distribution.map((row) => (
+                <tr key={row.id} className="hover:bg-white/[0.02] transition">
+                  <td className="py-3.5 pr-4">
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: row.color }}
+                      />
+                      <div>
+                        <div className="font-semibold text-slate-100">{row.name}</div>
+                        <span className="text-[11px] text-slate-400">{row.category}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-3 text-right tabular-nums text-slate-300">
+                    {row.sessionCount} phiên
+                  </td>
+                  <td className="py-3.5 px-3 text-right tabular-nums">
+                    <span className="font-bold text-white">{row.hours}h</span>{' '}
+                    <span className="text-xs text-slate-400">({row.mins}p)</span>
+                  </td>
+                  <td className="py-3.5 px-3 text-right tabular-nums">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-800 border border-white/10 text-xs font-semibold text-cyan-300">
+                      {row.avgComp} / 5.0
+                    </span>
+                  </td>
+                  <td className="py-3.5 pl-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${row.share}%`,
+                            backgroundColor: row.color
+                          }}
+                        />
+                      </div>
+                      <span className="w-10 text-right text-xs font-bold tabular-nums text-slate-200">
+                        {row.share}%
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
 
 // ============================================================================
-// 8. INTERACTIVE LOGGER FORM (`TimeTrackerForm.tsx`)
+// 7. INTERACTIVE LOGGER FORM (`TimeTrackerForm.tsx`)
 // ============================================================================
 
 interface TimeTrackerFormProps {
@@ -1269,213 +1237,7 @@ const TimeTrackerForm: React.FC<TimeTrackerFormProps> = ({
 };
 
 // ============================================================================
-// 9. POMODORO FOCUS TIMER (`PomodoroTimer.tsx`)
-// ============================================================================
-
-interface PomodoroTimerProps {
-  onAutoLogPomodoro: (subjectId: SubjectId, minutes: number, comprehension: number, note: string) => void;
-}
-
-const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ onAutoLogPomodoro }) => {
-  const [mode, setMode] = useState<'focus25' | 'focus50' | 'break5'>('focus25');
-  const [secondsLeft, setSecondsLeft] = useState<number>(25 * 60);
-  const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [selectedSubject, setSelectedSubject] = useState<SubjectId>('sat');
-  const [comprehension, setComprehension] = useState<number>(4);
-  const [sessionBanner, setSessionBanner] = useState<string | null>(null);
-
-  const totalModeSeconds = mode === 'focus25' ? 25 * 60 : mode === 'focus50' ? 50 * 60 : 5 * 60;
-
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setIsRunning(false);
-          playNotificationChime();
-          if (mode !== 'break5') {
-            const mins = mode === 'focus25' ? 25 : 50;
-            const subj = SUBJECTS.find((s) => s.id === selectedSubject);
-            onAutoLogPomodoro(
-              selectedSubject,
-              mins,
-              comprehension,
-              `Phiên Pomodoro hoàn tất (${mins} phút • ${subj?.shortName})`
-            );
-            setSessionBanner(`🎉 Đã tự động cộng +${mins} phút vào môn ${subj?.shortName}!`);
-            setTimeout(() => setSessionBanner(null), 5000);
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, mode, selectedSubject, comprehension, onAutoLogPomodoro]);
-
-  const switchMode = (newMode: 'focus25' | 'focus50' | 'break5') => {
-    setIsRunning(false);
-    setMode(newMode);
-    setSecondsLeft(newMode === 'focus25' ? 25 * 60 : newMode === 'focus50' ? 50 * 60 : 5 * 60);
-  };
-
-  const handleLogElapsedNow = () => {
-    const elapsedSeconds = totalModeSeconds - secondsLeft;
-    const elapsedMinutes = Math.max(1, Math.round(elapsedSeconds / 60));
-    const subj = SUBJECTS.find((s) => s.id === selectedSubject);
-    onAutoLogPomodoro(
-      selectedSubject,
-      elapsedMinutes,
-      comprehension,
-      `Phiên Focus Pomodoro (${elapsedMinutes} phút • ${subj?.shortName})`
-    );
-    setIsRunning(false);
-    setSecondsLeft(totalModeSeconds);
-    setSessionBanner(`✅ Đã ghi nhận +${elapsedMinutes} phút học ${subj?.shortName}!`);
-    setTimeout(() => setSessionBanner(null), 4000);
-  };
-
-  const minsDisplay = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
-  const secsDisplay = String(secondsLeft % 60).padStart(2, '0');
-  const progressPct = Math.round(((totalModeSeconds - secondsLeft) / totalModeSeconds) * 100);
-
-  return (
-    <div className="rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg relative overflow-hidden">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
-            <Clock className="w-4 h-4" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-white">Pomodoro Focus Timer</h2>
-            <p className="text-xs text-slate-400">Tự động cộng dồn giờ học khi hết giờ</p>
-          </div>
-        </div>
-
-        {/* Mode Switcher */}
-        <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs">
-          <button
-            onClick={() => switchMode('focus25')}
-            className={`px-2.5 py-1 rounded-lg font-medium transition ${
-              mode === 'focus25' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            25p
-          </button>
-          <button
-            onClick={() => switchMode('focus50')}
-            className={`px-2.5 py-1 rounded-lg font-medium transition ${
-              mode === 'focus50' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            50p
-          </button>
-          <button
-            onClick={() => switchMode('break5')}
-            className={`px-2.5 py-1 rounded-lg font-medium transition ${
-              mode === 'break5' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Nghỉ 5p
-          </button>
-        </div>
-      </div>
-
-      {/* Timer Display */}
-      <div className="my-4 p-4 rounded-2xl bg-slate-950/80 border border-white/10 flex flex-col items-center justify-center relative">
-        <div className="text-5xl font-black tracking-wider text-white tabular-nums font-mono">
-          {minsDisplay}:{secsDisplay}
-        </div>
-        <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-3">
-          <div
-            className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 transition-all duration-300"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-
-        <div className="flex items-center gap-2.5 mt-4">
-          <button
-            onClick={() => setIsRunning(!isRunning)}
-            className={`px-5 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition shadow-md ${
-              isRunning
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
-            }`}
-          >
-            {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isRunning ? 'Tạm dừng' : 'Bắt đầu Focus'}</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setIsRunning(false);
-              setSecondsLeft(totalModeSeconds);
-            }}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition"
-            title="Đặt lại đồng hồ"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
-
-          {mode !== 'break5' && secondsLeft < totalModeSeconds && (
-            <button
-              onClick={handleLogElapsedNow}
-              className="px-3 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition"
-              title="Lưu ngay số phút vừa bấm giờ vào thống kê"
-            >
-              Lưu phiên ngay
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Subject & Comprehension Linked to Timer */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-        <div className="sm:col-span-2">
-          <label className="block text-[11px] text-slate-400 mb-1">
-            Môn học đang bấm giờ:
-          </label>
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value as SubjectId)}
-            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs"
-          >
-            {SUBJECTS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-[11px] text-slate-400 mb-1">Mức độ hiểu:</label>
-          <select
-            value={comprehension}
-            onChange={(e) => setComprehension(Number(e.target.value))}
-            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-cyan-300 font-semibold text-xs"
-          >
-            {[5, 4, 3, 2, 1].map((lvl) => (
-              <option key={lvl} value={lvl}>
-                {lvl} ★ / 5
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {sessionBanner && (
-        <div className="mt-3 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-200 text-xs font-medium text-center">
-          {sessionBanner}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ============================================================================
-// 10. ANALYTICS & TREND CHARTS (`AnalyticsCharts.tsx`)
+// 8. ANALYTICS & TREND CHARTS (`AnalyticsCharts.tsx`)
 // ============================================================================
 
 interface AnalyticsChartsProps {
@@ -1830,7 +1592,7 @@ const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
 };
 
 // ============================================================================
-// 11. SMART STREAK & GITHUB-STYLE ACTIVITY HEATMAP (`ActivityHeatmap.tsx`)
+// 9. SMART STREAK & GITHUB-STYLE ACTIVITY HEATMAP (`ActivityHeatmap.tsx`)
 // ============================================================================
 
 interface ActivityHeatmapProps {
@@ -1929,7 +1691,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ sessions, streakDays 
 };
 
 // ============================================================================
-// 12. AI STUDY ASSISTANT MINI-WIDGET (`AiStudyAssistant.tsx`)
+// 10. AI STUDY ASSISTANT MINI-WIDGET (`AiStudyAssistant.tsx`)
 // ============================================================================
 
 interface AiStudyAssistantProps {
@@ -1979,10 +1741,10 @@ const AiStudyAssistant: React.FC<AiStudyAssistantProps> = ({
     return [
       `📊 **Chẩn đoán Học thuật từ dữ liệu Local-first (${totalHours}h / ${targetTotalHours}h):**`,
       `- **Môn đầu tư nhiều nhất:** ${mostStudied.name} (${(mostStudied.mins / 60).toFixed(1)}h).`,
-      `- **Môn đang bị bỏ ngỏ:** ${leastStudied.name} (chỉ ${(leastStudied.mins / 60).toFixed(1)}h) — Cần bổ sung ít nhất 2 phiên Pomodoro 45p tuần này.`,
+      `- **Môn đang bị bỏ ngỏ:** ${leastStudied.name} (chỉ ${(leastStudied.mins / 60).toFixed(1)}h) — Cần bổ sung ít nhất 2 phiên học 45p tuần này.`,
       weakestComp
         ? `- **Cảnh báo Độ hiểu bài thấp nhất:** ${weakestComp.name} đang ở mức **${weakestComp.avgComp.toFixed(1)}/5.0**. Thay vì chỉ làm đề liên tục, bạn nên dành 30 phút lập Error Log phân tích lỗi sai cốt lõi.`
-        : `- Bạn chưa có phiên học nào được ghi nhận. Hãy bấm giờ Pomodoro 25 phút đầu tiên!`,
+        : `- Bạn chưa có phiên học nào được ghi nhận. Hãy thêm phiên học đầu tiên ở bảng bên trên!`,
       `- **Chiến thuật cho câu hỏi "${userPrompt}":** Với mục tiêu SAT 1600 (Deadline sớm) và AP Calculus BC, hãy áp dụng quy tắc **60/25/15**: 60% thời gian cho SAT + AP Calc buổi sáng/tối khi não tỉnh táo nhất, 25% cho IELTS Writing/Speaking và 15% ôn Vật lý & Ngữ pháp.`
     ].join('\n');
   };
@@ -2173,7 +1935,7 @@ const AiStudyAssistant: React.FC<AiStudyAssistantProps> = ({
 };
 
 // ============================================================================
-// 13. PROJECT STRUCTURE & VERCEL DEPLOYMENT MODAL
+// 11. PROJECT STRUCTURE & VERCEL DEPLOYMENT MODAL
 // ============================================================================
 
 interface ProjectGuideModalProps {
@@ -2219,7 +1981,6 @@ const ProjectGuideModal: React.FC<ProjectGuideModalProps> = ({ isOpen, onClose }
 │   │   ├── TimeDistributionTable.tsx# Bảng phân bổ giờ học & % tỷ trọng 5 môn
 │   │   ├── TimeTrackerForm.tsx      # Form ghi nhận phiên học & mức độ hiểu bài (1-5)
 │   │   ├── AnalyticsCharts.tsx      # Biểu đồ Recharts (7/14/30 ngày) & Xu hướng điểm
-│   │   ├── PomodoroTimer.tsx        # Đồng hồ bấm giờ tự động cộng dồn vào môn học
 │   │   ├── ActivityHeatmap.tsx      # Bản đồ nhiệt GitHub Streak 84 ngày
 │   │   └── AiStudyAssistant.tsx     # Trợ lý AI phân tích lộ trình ôn tập
 │   ├── App.tsx                      # Main Dashboard Container & LocalStorage Sync
@@ -2275,7 +2036,7 @@ npm run dev`}
 };
 
 // ============================================================================
-// 14. MAIN DASHBOARD APPLICATION (`App.tsx`)
+// 12. MAIN DASHBOARD APPLICATION (`App.tsx`)
 // ============================================================================
 
 export function App() {
@@ -2352,22 +2113,6 @@ export function App() {
       lastUpdated: new Date().toISOString()
     }));
     showToast('🗑️ Đã xóa bản ghi phiên học.');
-  };
-
-  const handleAutoLogPomodoro = (
-    subjectId: SubjectId,
-    minutes: number,
-    comprehension: number,
-    note: string
-  ) => {
-    handleAddSession({
-      subjectId,
-      durationMinutes: minutes,
-      comprehension,
-      topic: note,
-      date: getDateDaysAgo(0),
-      source: 'pomodoro'
-    });
   };
 
   const handleUpdateTargetHours = (newTarget: number) => {
@@ -2492,9 +2237,8 @@ export function App() {
 
         {/* 3. Middle Grid: Time Distribution Table + Interactive Logger Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7">
             <TimeDistributionTable sessions={state.sessions} />
-            <PomodoroTimer onAutoLogPomodoro={handleAutoLogPomodoro} />
           </div>
 
           <div className="lg:col-span-5">
