@@ -1796,7 +1796,7 @@ const AiStudyAssistant: React.FC<AiStudyAssistantProps> = memo(({
         .map((g) => `${g.title}: hiện tại ${g.currentValue}/${g.targetValue} (${g.deadlineTag})`)
         .join('; ');
 
-      const apiKey = '';
+      const apiKey = (import.meta.env as Record<string, string>).geminiapikey || '';
       if (!apiKey) {
         throw new Error('Use fast local diagnostic when API key is not configured');
       }
