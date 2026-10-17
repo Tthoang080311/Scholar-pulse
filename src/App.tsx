@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   BookOpen,
@@ -212,7 +211,10 @@ const generateSeedSessions = (): StudySession[] => {
     { daysAgo: 1, subjectId: 'ielts', durationMinutes: 75, comprehension: 4, topic: 'Writing Task 2: Opinion Essay + Lexical Resource' },
     { daysAgo: 1, subjectId: 'physics', durationMinutes: 45, comprehension: 3, topic: 'Dao động điều hòa & Con lắc lò xo nâng cao' },
     { daysAgo: 2, subjectId: 'sat', durationMinutes: 110, comprehension: 5, topic: 'Full Math Timed Drill + Desmos Regression Tricks' },
-    { daysAgo: 2, subjectId: 'english_grammar', durationMinutes: 50, comprehension: 4, topic: 'Inversion, Subjunctive Mood & C2 Collocations' }
+    { daysAgo: 2, subjectId: 'english_grammar', durationMinutes: 50, comprehension: 4, topic: 'Inversion, Subjunctive Mood & C2 Collocations' },
+    { daysAgo: 3, subjectId: 'math_ap', durationMinutes: 85, comprehension: 4, topic: 'Parametric Equations & Polar Coordinates (BC)' },
+    { daysAgo: 4, subjectId: 'ielts', durationMinutes: 60, comprehension: 4, topic: 'Cambridge 19 Test 3 Listening + Reading Passage 3' },
+    { daysAgo: 5, subjectId: 'physics', durationMinutes: 60, comprehension: 3, topic: 'Điện xoay chiều & Giản đồ Fre-nen' }
   ];
 
   return rawSeeds.map((seed, index) => {
@@ -275,6 +277,7 @@ export function App() {
   });
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Form states
@@ -288,6 +291,18 @@ export function App() {
   const [rangeDays, setRangeDays] = useState<7 | 14 | 30>(14);
   const [activeChartTab, setActiveChartTab] = useState<'time' | 'scores'>('time');
 
+  // AI Chat states
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      content: 'Xin chào! Mình là **ScholarPulse AI Coach v2.5**. Mình đã sẵn sàng phân tích dữ liệu học tập và giúp bạn tối ưu tiến trình!',
+      timestamp: 'Sẵn sàng'
+    }
+  ]);
+  const [inputChat, setInputChat] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -296,8 +311,23 @@ export function App() {
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
+
+  const streakDays = useMemo(() => {
+    if (state.sessions.length === 0) return 0;
+    const uniqueDates = new Set(state.sessions.map((s) => s.date));
+    let streak = 0;
+    let cursor = 0;
+    if (!uniqueDates.has(getDateDaysAgo(0)) && uniqueDates.has(getDateDaysAgo(1))) {
+      cursor = 1;
+    }
+    while (uniqueDates.has(getDateDaysAgo(cursor))) {
+      streak++;
+      cursor++;
+    }
+    return streak;
+  }, [state.sessions]);
 
   const stats = useMemo(() => {
     const totalMinutes = state.sessions.reduce((acc, s) => acc + s.durationMinutes, 0);
@@ -359,6 +389,19 @@ export function App() {
     }).filter((d) => d.value > 0);
   }, [state.sessions, rangeDays]);
 
+  const heatmapDays = useMemo(() => {
+    const map = new Map<string, number>();
+    state.sessions.forEach((s) => {
+      map.set(s.date, (map.get(s.date) || 0) + s.durationMinutes);
+    });
+    const days = [];
+    for (let i = 83; i >= 0; i--) {
+      const d = getDateDaysAgo(i);
+      days.push({ date: d, minutes: map.get(d) || 0 });
+    }
+    return days;
+  }, [state.sessions]);
+
   const handleAddSession = (e: React.FormEvent) => {
     e.preventDefault();
     if (durationMinutes <= 0) return;
@@ -379,7 +422,7 @@ export function App() {
       lastUpdated: new Date().toISOString()
     }));
     setTopic('');
-    showToast('✅ Đã lưu phiên học!');
+    showToast('✨ Đã lưu phiên học mới thành công!');
   };
 
   const handleDeleteSession = (id: string) => {
@@ -388,26 +431,43 @@ export function App() {
       sessions: prev.sessions.filter((s) => s.id !== id),
       lastUpdated: new Date().toISOString()
     }));
+    showToast('🗑️ Đã xóa phiên học.');
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100">
+    <div className="min-h-screen bg-[#0b0f19] text-slate-100 selection:bg-purple-500 selection:text-white relative overflow-x-hidden">
+      {/* Hiệu ứng ánh sáng nền Neon lung linh như bản cũ */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-600/15 rounded-full blur-[130px]" />
+        <div className="absolute top-1/4 -right-40 w-96 h-96 bg-blue-600/15 rounded-full blur-[130px]" />
+        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-cyan-500/10 rounded-full blur-[140px]" />
+      </div>
+
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl bg-slate-900 border border-purple-500/40 text-white text-xs font-semibold shadow-lg">
-          {toastMessage}
+        <div className="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl bg-slate-900/95 border border-purple-500/40 text-white text-xs font-semibold shadow-2xl flex items-center gap-2 animate-bounce">
+          <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0b0f19]">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      {/* Header đỉnh cao với hiệu ứng kính mờ */}
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0b0f19]/85 backdrop-blur-xl">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center">
-              <Brain className="w-5 h-5 text-purple-400" />
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 p-[1px] shadow-lg shadow-purple-500/20">
+              <div className="w-full h-full bg-[#0b0f19] rounded-[11px] flex items-center justify-center">
+                <Brain className="w-5 h-5 text-purple-400" />
+              </div>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">ScholarPulse v2.5 (Lite - No Pomodoro)</h1>
-              <p className="text-xs text-slate-400">Đã tối ưu hiệu năng mượt 60FPS</p>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-purple-300 bg-clip-text text-transparent">
+                  ScholarPulse
+                </h1>
+                <span className="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                  v2.5
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 hidden sm:block">Advanced Learning Analytics &amp; Local-first Tracker</p>
             </div>
           </div>
 
@@ -415,7 +475,7 @@ export function App() {
             {state.sessions.length > 0 ? (
               <button
                 onClick={() => setState(getZeroBlankState())}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium flex items-center gap-1.5"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-white/10 text-xs font-medium transition"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
                 <span>Reset về 0</span>
@@ -423,80 +483,152 @@ export function App() {
             ) : (
               <button
                 onClick={() => setState(getInitialDemoState())}
-                className="px-3 py-1.5 rounded-lg bg-purple-600/20 text-purple-300 border border-purple-500/30 text-xs font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition"
               >
-                Nạp dữ liệu mẫu
+                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                <span>Nạp dữ liệu mẫu</span>
               </button>
             )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* 4 Metric Cards */}
+      {/* Main Container */}
+      <main className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* 1. 4 Thẻ Thống kê đồ họa xịn xò */}
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="rounded-2xl bg-[#111827] border border-white/10 p-5">
-            <span className="text-xs font-semibold uppercase text-slate-400">Tổng thời gian học</span>
-            <div className="text-3xl font-extrabold text-white mt-2">
+          <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Tổng thời gian học</span>
+              <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-3xl font-extrabold text-white tabular-nums tracking-tight">
               {stats.hours}h {stats.minutes}m
             </div>
-            <p className="mt-2 text-xs text-purple-300">
-              Giờ hiệu quả: {stats.effectiveHours.toFixed(1)}h
+            <p className="mt-2.5 text-xs text-slate-400 flex justify-between">
+              <span>Hiệu quả (Weighted):</span>
+              <span className="text-purple-300 font-semibold">{stats.effectiveHours.toFixed(1)}h</span>
             </p>
           </div>
 
-          <div className="rounded-2xl bg-[#111827] border border-white/10 p-5">
-            <span className="text-xs font-semibold uppercase text-slate-400">Độ hiểu bài TB</span>
-            <div className="text-3xl font-extrabold text-white mt-2">
-              {stats.avgComprehension.toFixed(1)} <span className="text-sm text-slate-400">/ 5.0</span>
+          <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Học lực &amp; Velocity</span>
+              <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                <Zap className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-3xl font-extrabold text-white tabular-nums tracking-tight">
+              {stats.avgComprehension.toFixed(1)} <span className="text-sm font-medium text-slate-400">/ 5.0</span>
+            </div>
+            <div className="mt-3 w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full" style={{ width: `${(stats.avgComprehension / 5) * 100}%` }} />
             </div>
           </div>
 
-          <div className="rounded-2xl bg-[#111827] border border-white/10 p-5">
-            <span className="text-xs font-semibold uppercase text-slate-400">Số phiên đã học</span>
-            <div className="text-3xl font-extrabold text-white mt-2">{state.sessions.length}</div>
+          <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Phiên đã ghi nhận</span>
+              <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                <Layers className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-3xl font-extrabold text-white tabular-nums tracking-tight">
+              {state.sessions.length}
+            </div>
+            <div className="mt-2.5 flex items-center justify-between text-xs">
+              <span className="text-slate-400">Streak liên tục:</span>
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">
+                🔥 {streakDays} ngày
+              </span>
+            </div>
           </div>
 
-          <div className="rounded-2xl bg-[#111827] border border-white/10 p-5">
-            <span className="text-xs font-semibold uppercase text-slate-400">Tiến độ tổng</span>
-            <div className="text-3xl font-extrabold text-white mt-2">{stats.progressPercent}%</div>
-            <p className="mt-2 text-xs text-emerald-300">
-              Mục tiêu: {state.targetTotalHours}h
-            </p>
+          <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Tiến độ Ôn tập</span>
+              <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <Target className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-3xl font-extrabold text-white tabular-nums tracking-tight">
+              {stats.progressPercent}%
+            </div>
+            <div className="mt-3 w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-400 rounded-full" style={{ width: `${stats.progressPercent}%` }} />
+            </div>
           </div>
         </section>
 
-        {/* Bảng Phân bổ + Form Ghi nhận (Không còn Pomodoro) */}
+        {/* 2. Mục tiêu trọng tâm (SAT, IELTS, AP Calc) */}
+        <div className="rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+              <Award className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white">Mục tiêu &amp; Deadline Trọng tâm</h2>
+              <p className="text-xs text-slate-400">Theo dõi tiến độ SAT 1600, IELTS 8.0+ và AP Calculus BC</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {state.goals.map((goal) => (
+              <div key={goal.id} className="rounded-xl bg-slate-950/60 border border-white/10 p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-base font-bold text-white">{goal.title}</h3>
+                  <span className="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                    {goal.deadlineTag}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">{goal.subtitle}</p>
+                <div className="mt-3 flex justify-between text-xs">
+                  <span className="text-purple-300 font-semibold">{goal.targetLabel}</span>
+                  <span className="text-white font-bold">{goal.currentValue} {goal.unit}</span>
+                </div>
+                <p className="mt-2 text-xs text-slate-400">{goal.notes}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Bảng Phân bổ & Form Ghi nhận (Đã sạch bóng Pomodoro) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-7 rounded-2xl bg-[#111827] border border-white/10 p-5">
-            <h2 className="text-base font-bold text-white mb-4">Phân bổ Thời gian Giữa các Môn học</h2>
+          <div className="lg:col-span-7 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <h2 className="text-base font-bold text-white">Phân bổ Thời gian Giữa các Môn học</h2>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-white/10 text-xs text-slate-400">
-                    <th className="py-3">Môn học</th>
-                    <th className="py-3 text-right">Số phiên</th>
-                    <th className="py-3 text-right">Thời lượng</th>
-                    <th className="py-3 text-right">Độ hiểu</th>
-                    <th className="py-3 pl-4 w-44">Tỷ trọng</th>
+                  <tr className="border-b border-white/10 text-[11px] font-semibold uppercase text-slate-400">
+                    <th className="py-3 pr-4">Môn học</th>
+                    <th className="py-3 px-3 text-right">Số phiên</th>
+                    <th className="py-3 px-3 text-right">Thời lượng</th>
+                    <th className="py-3 px-3 text-right">Độ hiểu TB</th>
+                    <th className="py-3 pl-4 w-44">Tỷ trọng (%)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {distribution.map((row) => (
-                    <tr key={row.id}>
-                      <td className="py-3.5 font-semibold text-white">{row.name}</td>
-                      <td className="py-3.5 text-right text-slate-300">{row.sessionCount}</td>
-                      <td className="py-3.5 text-right font-bold text-white">{row.hours}h</td>
-                      <td className="py-3.5 text-right text-cyan-300">{row.avgComp}/5</td>
+                    <tr key={row.id} className="hover:bg-white/[0.02]">
+                      <td className="py-3.5 pr-4 flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: row.color }} />
+                        <span className="font-semibold text-slate-100">{row.name}</span>
+                      </td>
+                      <td className="py-3.5 px-3 text-right text-slate-300">{row.sessionCount} phiên</td>
+                      <td className="py-3.5 px-3 text-right font-bold text-white">{row.hours}h</td>
+                      <td className="py-3.5 px-3 text-right text-cyan-300">{row.avgComp} / 5</td>
                       <td className="py-3.5 pl-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2.5">
                           <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full"
-                              style={{ width: `${row.share}%`, backgroundColor: row.color }}
-                            />
+                            <div className="h-full rounded-full" style={{ width: `${row.share}%`, backgroundColor: row.color }} />
                           </div>
-                          <span className="text-xs w-9 text-right">{row.share}%</span>
+                          <span className="w-10 text-right text-xs font-bold">{row.share}%</span>
                         </div>
                       </td>
                     </tr>
@@ -506,15 +638,20 @@ export function App() {
             </div>
           </div>
 
-          <div className="lg:col-span-5 rounded-2xl bg-[#111827] border border-white/10 p-5">
-            <h2 className="text-base font-bold text-white mb-4">Ghi nhận Phiên học</h2>
+          <div className="lg:col-span-5 rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                <Plus className="w-4 h-4" />
+              </div>
+              <h2 className="text-base font-bold text-white">Ghi nhận Tiến trình Học tập</h2>
+            </div>
             <form onSubmit={handleAddSession} className="space-y-4">
               <div>
-                <label className="block text-xs text-slate-300 mb-1">Môn học</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Chọn Môn học</label>
                 <select
                   value={subjectId}
                   onChange={(e) => setSubjectId(e.target.value as SubjectId)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
                 >
                   {SUBJECTS.map((s) => (
                     <option key={s.id} value={s.id}>{s.name}</option>
@@ -524,76 +661,73 @@ export function App() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-300 mb-1">Thời lượng (phút)</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Thời lượng (phút)</label>
                   <input
                     type="number"
                     value={durationMinutes}
                     onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-300 mb-1">Ngày học</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Ngày thực hiện</label>
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs text-slate-300 mb-1">Độ hiểu bài (1 - 5)</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Mức độ hiểu bài (1 - 5)</label>
                 <div className="grid grid-cols-5 gap-2">
-                  {[1, 2, 3, 4, 5].map((lvl) => (
+                  {[1, 2, 3, 4, 5].map((level) => (
                     <button
-                      key={lvl}
+                      key={level}
                       type="button"
-                      onClick={() => setComprehension(lvl)}
-                      className={`py-2 rounded-xl text-sm font-bold border ${
-                        comprehension === lvl
-                          ? 'bg-purple-600 text-white border-purple-400'
-                          : 'bg-slate-950 border-white/10 text-slate-400'
+                      onClick={() => setComprehension(level)}
+                      className={`py-2 rounded-xl font-bold text-sm border ${
+                        comprehension === level ? 'bg-purple-600 text-white border-purple-400 shadow-md' : 'bg-slate-950 border-white/10 text-slate-400'
                       }`}
                     >
-                      {lvl} ★
+                      {level} ★
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs text-slate-300 mb-1">Ghi chú chuyên đề</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Ghi chú chuyên đề</label>
                 <input
                   type="text"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder="VD: Giải đề Bluebook Test #6..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-white/10 text-sm text-white"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm"
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-sm shadow-lg"
               >
                 Lưu Phiên Học
               </button>
             </form>
 
-            {/* Nhật ký gần đây */}
-            <div className="mt-5 pt-4 border-t border-white/10 space-y-2 max-h-40 overflow-y-auto">
-              {state.sessions.slice(0, 5).map((s) => {
+            <div className="mt-5 pt-4 border-t border-white/10 space-y-2 max-h-44 overflow-y-auto">
+              <span className="text-xs font-semibold text-slate-400 uppercase">Nhật ký gần đây</span>
+              {state.sessions.slice(0, 4).map((s) => {
                 const subj = SUBJECTS.find((item) => item.id === s.subjectId);
                 return (
-                  <div key={s.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-950 text-xs">
+                  <div key={s.id} className="flex items-center justify-between p-2 rounded-xl bg-slate-950 text-xs">
                     <div>
-                      <span className="font-semibold text-white">{subj?.shortName}</span> •{' '}
-                      <span className="text-purple-300">{s.durationMinutes}p</span> ({s.comprehension}★)
+                      <span className="font-semibold text-white">{subj?.shortName}</span> • <span className="text-purple-300">{s.durationMinutes}p</span>
                       <p className="text-[11px] text-slate-400">{s.topic}</p>
                     </div>
-                    <button onClick={() => handleDeleteSession(s.id)} className="text-slate-500 hover:text-rose-400">
+                    <button onClick={() => handleDeleteSession(s.id)} className="text-slate-500 hover:text-rose-400 p-1">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -603,18 +737,21 @@ export function App() {
           </div>
         </div>
 
-        {/* Biểu đồ Phân tích */}
-        <div className="rounded-2xl bg-[#111827] border border-white/10 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-white">Biểu đồ Phân tích Học thuật</h2>
-            <div className="flex gap-2">
+        {/* 4. Biểu đồ Recharts & Bản đồ nhiệt GitHub Streak */}
+        <div className="rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                <BarChart3 className="w-4 h-4" />
+              </div>
+              <h2 className="text-base font-bold text-white">Biểu đồ Phân tích &amp; Xu hướng Học thuật</h2>
+            </div>
+            <div className="flex gap-1 bg-slate-950 p-1 rounded-xl border border-white/10">
               {([7, 14, 30] as const).map((d) => (
                 <button
                   key={d}
                   onClick={() => setRangeDays(d)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
-                    rangeDays === d ? 'bg-purple-600 text-white' : 'bg-slate-900 text-slate-400'
-                  }`}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${rangeDays === d ? 'bg-purple-600 text-white' : 'text-slate-400'}`}
                 >
                   {d} ngày
                 </button>
@@ -623,32 +760,59 @@ export function App() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <div className="lg:col-span-2 h-64 bg-slate-950 rounded-xl p-3">
+            <div className="lg:col-span-2 h-72 bg-slate-950/50 rounded-xl p-3 border border-white/5">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={dailyData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                   <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} />
                   <YAxis stroke="#94a3b8" fontSize={11} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px' }} />
-                  <Bar dataKey="totalHours" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px' }} />
+                  <Bar dataKey="totalHours" fill="#a855f7" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="h-64 bg-slate-950 rounded-xl p-3">
+            <div className="h-72 bg-slate-950/50 rounded-xl p-3 border border-white/5">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={40} outerRadius={65}>
+                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={45} outerRadius={70}>
                     {pieData.map((entry, idx) => (
                       <Cell key={idx} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderRadius: '10px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
         </div>
+
+        {/* 5. GitHub Heatmap Streak */}
+        <div className="rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 shadow-lg">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <Flame className="w-4 h-4" />
+            </div>
+            <h2 className="text-base font-bold text-white">Smart Streak &amp; Bản đồ nhiệt Hoạt động (84 ngày)</h2>
+          </div>
+          <div className="overflow-x-auto pb-2">
+            <div className="grid grid-flow-col grid-rows-7 gap-1.5 min-w-[520px]">
+              {heatmapDays.map((item) => (
+                <div
+                  key={item.date}
+                  title={`${item.date}: ${item.minutes} phút`}
+                  className={`w-4 h-4 rounded-[4px] border ${
+                    item.minutes === 0 ? 'bg-slate-800/70 border-white/5' : item.minutes < 60 ? 'bg-emerald-700 border-emerald-500' : 'bg-cyan-400 border-white'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </main>
+
+      <footer className="relative z-10 border-t border-white/10 mt-10 py-5 text-center text-xs text-slate-500">
+        ScholarPulse v2.5 • Local-first Tracker (Đã gỡ bỏ hoàn toàn Pomodoro)
+      </footer>
     </div>
   );
 }
